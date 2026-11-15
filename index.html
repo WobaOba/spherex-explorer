@@ -20,6 +20,7 @@
     --surface: #ffffff;
     --surface-low: #f8fafd;
     --surface-field: #f0f4f9;
+    --surface-hover: #f1f3f4;
     --on-surface: #1f1f1f;
     --on-surface-var: #444746;
     --outline: #747775;
@@ -36,6 +37,10 @@
 
     --pred: #8a4b00;
     --pred-container: #ffdfa6;
+    --error: #b3261e;
+    --error-container: #f9dedc;
+    --on-error-container: #410e0b;
+    --tip-container: #e8f0fe;
     --inverse: #303030;
     --on-inverse: #f2f2f2;
 
@@ -43,6 +48,7 @@
     --accent: var(--primary);
     --emerald: #146c2e;
     --gold: var(--pred);
+    --rose: var(--error);
     --muted: var(--on-surface-var);
 
     --elev-1: 0 1px 2px rgba(60, 64, 67, 0.3), 0 1px 3px 1px rgba(60, 64, 67, 0.15);
@@ -57,6 +63,7 @@
   }
 
   * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
   html, body {
     margin: 0;
     height: 100%;
@@ -68,6 +75,7 @@
   }
   button, input { font: inherit; color: inherit; }
   button { cursor: pointer; }
+  button:disabled { cursor: progress; opacity: 0.6; }
   :focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
 
   .msi {
@@ -86,6 +94,70 @@
     user-select: none;
     flex: none;
   }
+
+  /* Botones base */
+  .icon-btn {
+    width: 40px;
+    height: 40px;
+    border: 0;
+    border-radius: 50%;
+    background: transparent;
+    color: var(--on-surface-var);
+    display: grid;
+    place-items: center;
+    flex: none;
+  }
+  .icon-btn:hover { background: var(--hover); }
+  .icon-btn.sm { width: 32px; height: 32px; }
+  .icon-btn.sm .msi { font-size: 20px; }
+
+  .text-btn {
+    border: 0;
+    background: transparent;
+    color: var(--primary);
+    font-family: var(--font-ui);
+    font-weight: 500;
+    font-size: 14px;
+    padding: 0 12px;
+    height: 36px;
+    border-radius: 18px;
+  }
+  .text-btn:hover { background: rgba(11, 87, 208, 0.08); }
+
+  .tonal-btn {
+    flex: none;
+    height: 40px;
+    padding: 0 20px;
+    border: 0;
+    border-radius: 20px;
+    background: var(--primary-container);
+    color: var(--on-primary-container);
+    font-family: var(--font-ui);
+    font-size: 14px;
+    font-weight: 500;
+  }
+  .tonal-btn:hover { box-shadow: var(--elev-1); }
+  .tonal-btn.sm { height: 32px; padding: 0 14px; font-size: 13px; }
+
+  .outline-btn {
+    flex: none;
+    height: 32px;
+    padding: 0 12px;
+    border: 1px solid var(--outline-var);
+    border-radius: 8px;
+    background: var(--surface);
+    color: var(--on-surface-var);
+    font-family: var(--font-ui);
+    font-size: 13px;
+    font-weight: 500;
+    white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .outline-btn .msi { font-size: 18px; }
+  .outline-btn:hover { background: var(--surface-hover); }
+  .outline-btn.active { background: var(--primary-container); color: var(--on-primary-container); border-color: transparent; }
 
   /* ------------------------------------------------------------------
      Mapa del cielo: ocupa todo lo que queda a la derecha del panel
@@ -117,7 +189,7 @@
     flex-direction: column;
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
   }
-  .panel-head { padding: 12px 16px 12px; flex: none; }
+  .panel-head { padding: 12px 16px; flex: none; }
   .panel-body {
     flex: 1;
     overflow-y: auto;
@@ -161,18 +233,6 @@
   }
   #inp-query:focus { outline: none; }
   #inp-query::placeholder { color: var(--on-surface-var); }
-
-  .icon-btn {
-    width: 40px;
-    height: 40px;
-    border: 0;
-    border-radius: 50%;
-    background: transparent;
-    color: var(--on-surface-var);
-    display: grid;
-    place-items: center;
-  }
-  .icon-btn:hover { background: var(--hover); }
   .search-box .icon-btn { color: var(--primary); }
 
   .suggestions {
@@ -189,7 +249,6 @@
     box-shadow: var(--elev-2);
     z-index: 30;
   }
-  .suggestions[hidden] { display: none; }
   .suggestions li {
     display: flex;
     align-items: center;
@@ -220,7 +279,6 @@
     grid-template-columns: 1fr 1fr 76px auto;
     gap: 8px;
     margin-top: 12px;
-    align-items: stretch;
   }
   .field {
     display: flex;
@@ -247,20 +305,40 @@
   .field input:focus { outline: none; }
   .field input::-webkit-outer-spin-button,
   .field input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
-  .text-btn {
-    border: 0;
-    background: transparent;
-    color: var(--primary);
-    font-family: var(--font-ui);
-    font-weight: 500;
-    font-size: 14px;
-    padding: 0 12px;
-    border-radius: 20px;
+  .coords .text-btn { height: auto; border-radius: 8px; }
+
+  /* Aviso de datos simulados (dentro de la ficha) */
+  .sim-banner {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    padding: 12px 24px;
+    background: var(--error-container);
+    color: var(--on-error-container);
+    font-size: 13px;
+    line-height: 18px;
   }
-  .text-btn:hover { background: rgba(11, 87, 208, 0.08); }
+  .sim-banner .msi { font-size: 20px; color: var(--error); margin-top: -1px; }
+  .sim-banner strong { font-weight: 500; }
+
+  /* Guía de inicio */
+  .tip {
+    margin: 16px 16px 0;
+    padding: 14px 16px 6px;
+    border-radius: 12px;
+    background: var(--tip-container);
+    display: grid;
+    grid-template-columns: 24px 1fr;
+    column-gap: 12px;
+  }
+  .tip > .msi { color: var(--primary); font-size: 22px; }
+  .tip-title { font-family: var(--font-ui); font-size: 14px; font-weight: 500; margin: 1px 0 6px; }
+  .tip ol { margin: 0; padding-left: 18px; font-size: 13px; line-height: 19px; color: var(--on-surface-var); }
+  .tip li + li { margin-top: 4px; }
+  .tip-actions { grid-column: 2; display: flex; justify-content: flex-end; margin-top: 4px; }
 
   /* Espectro: ocupa el lugar de la foto de portada */
-  .spectrum { background: var(--surface-low); }
+  .spectrum { background: var(--surface-low); margin-top: 16px; }
   .spec-plot { padding: 16px 0 4px; }
   #spectrum-canvas { width: 100%; height: 180px; display: block; }
   .spec-caption {
@@ -330,13 +408,23 @@
     color: var(--on-surface);
   }
   .place-type { display: block; margin-top: 4px; color: var(--on-surface-var); font-size: 14px; }
+  .place-origin {
+    display: flex;
+    gap: 6px;
+    align-items: flex-start;
+    margin-top: 8px;
+    font-size: 12px;
+    line-height: 16px;
+    color: var(--on-surface-var);
+  }
+  .place-origin .msi { font-size: 16px; color: var(--outline); }
   .place-about { margin: 8px 0 0; color: var(--on-surface-var); font-size: 14px; line-height: 20px; }
 
   /* Acciones circulares */
   .actions {
     display: flex;
     justify-content: space-around;
-    padding: 16px 12px;
+    padding: 16px 8px;
     border-bottom: 1px solid var(--divider);
   }
   .action {
@@ -346,12 +434,13 @@
     flex-direction: column;
     align-items: center;
     gap: 6px;
-    width: 88px;
+    width: 84px;
     padding: 0;
     font-size: 12px;
     line-height: 16px;
     font-weight: 500;
     color: var(--on-surface);
+    text-align: center;
   }
   .action-icon {
     width: 40px;
@@ -365,7 +454,7 @@
     box-shadow: inset 0 0 0 1px var(--outline-var);
     transition: background-color 0.15s, color 0.15s;
   }
-  .action:hover .action-icon { background: #f1f3f4; }
+  .action:hover .action-icon { background: var(--surface-hover); }
   .action.active .action-icon {
     background: var(--primary-container);
     color: var(--on-primary-container);
@@ -437,21 +526,123 @@
     white-space: nowrap;
   }
   .pill-btn .msi { font-size: 18px; color: var(--on-surface-var); }
-  .pill-btn:hover { background: #f1f3f4; }
+  .pill-btn:hover { background: var(--surface-hover); }
   .pill-btn.active { background: var(--chip-selected); color: var(--on-chip-selected); }
   .pill-btn.active .msi { color: var(--on-chip-selected); font-variation-settings: "FILL" 1, "wght" 400, "GRAD" 0, "opsz" 20; }
 
   /* ------------------------------------------------------------------
-     Línea de estado (snackbar)
+     Tarjetas flotantes sobre el mapa
      ------------------------------------------------------------------ */
-  .snackbar {
+  .float-card {
     position: fixed;
-    left: calc(var(--panel-w) + (100vw - var(--panel-w)) / 2);
-    transform: translateX(-50%);
-    bottom: 136px;
-    z-index: 16;
-    max-width: min(560px, calc(100vw - var(--panel-w) - 32px));
-    width: max-content;
+    top: 64px;
+    z-index: 25;
+    background: var(--surface);
+    border-radius: 8px;
+    box-shadow: var(--elev-3);
+    overflow: hidden;
+  }
+  .card-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 12px 8px 8px 16px;
+  }
+  .card-title {
+    margin: 0;
+    font-family: var(--font-ui);
+    font-size: 16px;
+    line-height: 22px;
+    font-weight: 500;
+    color: var(--on-surface);
+  }
+  .card-sub { margin: 2px 0 0; font-size: 12px; line-height: 16px; color: var(--on-surface-var); font-variant-numeric: tabular-nums; }
+
+  /* Tarjeta de imágenes del objeto (óptico, píxeles SPHEREx, GIF) */
+  .insp-card {
+    left: calc(var(--panel-w) + 16px);
+    width: min(540px, calc(100vw - var(--panel-w) - 32px));
+  }
+  .insp-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    padding: 0 16px;
+  }
+  .insp-tile { margin: 0; min-width: 0; }
+  .insp-tile img,
+  .gif-empty {
+    width: 100%;
+    aspect-ratio: 1;
+    display: block;
+    border-radius: 8px;
+    background: #000;
+    object-fit: cover;
+  }
+  .insp-tile img.pixelated { image-rendering: pixelated; object-fit: contain; }
+  .insp-tile figcaption {
+    margin-top: 6px;
+    font-size: 12px;
+    line-height: 16px;
+    color: var(--on-surface-var);
+  }
+  .insp-tile figcaption b { display: block; font-weight: 500; color: var(--on-surface); }
+  .gif-empty {
+    background: var(--surface-low);
+    box-shadow: inset 0 0 0 1px var(--outline-var);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 12px;
+    text-align: center;
+    font-size: 12px;
+    line-height: 16px;
+    color: var(--on-surface-var);
+  }
+  .card-actions { display: flex; flex-wrap: wrap; gap: 8px; padding: 12px 16px 16px; }
+
+  /* Visor de píxeles FITS reales */
+  .fits-card { right: 16px; width: 288px; }
+  .fits-card .fits-frame { margin: 0 16px; aspect-ratio: 1; border-radius: 8px; background: #000; overflow: hidden; }
+  .fits-card img { width: 100%; height: 100%; display: block; object-fit: contain; image-rendering: pixelated; }
+  .fits-card > p { margin: 8px 16px 0; font-size: 12px; line-height: 16px; color: var(--on-surface-var); }
+  .segmented { display: flex; margin: 12px 16px 16px; }
+  .segmented button {
+    flex: 1;
+    height: 32px;
+    border: 1px solid var(--outline);
+    background: var(--surface);
+    color: var(--on-surface);
+    font-family: var(--font-ui);
+    font-size: 13px;
+    font-weight: 500;
+  }
+  .segmented button:first-child { border-radius: 16px 0 0 16px; }
+  .segmented button:last-child { border-radius: 0 16px 16px 0; border-left: 0; }
+  .segmented button.active { background: var(--chip-selected); color: var(--on-chip-selected); }
+
+  /* ------------------------------------------------------------------
+     Pila inferior: línea de estado + tarjeta de tiempo
+     ------------------------------------------------------------------ */
+  .bottom-stack {
+    position: fixed;
+    left: calc(var(--panel-w) + 16px);
+    right: 16px;
+    bottom: 16px;
+    z-index: 20;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    pointer-events: none;
+  }
+  .bottom-stack > * { pointer-events: auto; }
+
+  .snackbar {
+    max-width: min(600px, 100%);
     padding: 12px 16px;
     border-radius: 4px;
     background: var(--inverse);
@@ -461,17 +652,9 @@
     box-shadow: var(--elev-3);
   }
 
-  /* ------------------------------------------------------------------
-     Tarjeta de tiempo (mediciones + deslizador)
-     ------------------------------------------------------------------ */
   .timeline {
-    position: fixed;
-    left: calc(var(--panel-w) + 16px);
-    right: 16px;
-    bottom: 16px;
-    max-width: 840px;
-    margin: 0 auto;
-    z-index: 20;
+    width: 100%;
+    max-width: 860px;
     background: var(--surface);
     border-radius: 8px;
     box-shadow: var(--elev-2);
@@ -480,53 +663,9 @@
     flex-direction: column;
     gap: 10px;
   }
-  .timeline-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
-  .timeline-row + .timeline-row { flex-wrap: nowrap; }
-
+  .timeline-row { display: flex; align-items: center; gap: 12px; }
   .epoch-chips { display: flex; gap: 8px; flex-wrap: wrap; }
   .epoch-btn {
-    height: 32px;
-    padding: 0 14px;
-    border: 1px solid var(--outline-var);
-    border-radius: 8px;
-    background: var(--surface);
-    color: var(--on-surface-var);
-    font-family: var(--font-ui);
-    font-size: 14px;
-    font-weight: 500;
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-  }
-  .epoch-btn:hover { background: #f1f3f4; }
-  .epoch-btn.active { background: var(--chip-selected); color: var(--on-chip-selected); border-color: transparent; }
-  .epoch-btn.interp { border-style: dashed; border-color: #e3a43d; color: var(--pred); }
-  .epoch-btn.interp .msi { font-size: 18px; }
-  .epoch-btn.interp.active { background: var(--pred-container); color: #2c1600; border-color: transparent; border-style: solid; }
-
-  .mode-tag {
-    margin-left: auto;
-    font-size: 13px;
-    font-weight: 500;
-    font-family: var(--font-ui);
-  }
-
-  .tonal-btn {
-    flex: none;
-    height: 40px;
-    min-width: 108px;
-    padding: 0 20px;
-    border: 0;
-    border-radius: 20px;
-    background: var(--primary-container);
-    color: var(--on-primary-container);
-    font-family: var(--font-ui);
-    font-size: 14px;
-    font-weight: 500;
-  }
-  .tonal-btn:hover { box-shadow: var(--elev-1); }
-  .outline-btn {
-    flex: none;
     height: 32px;
     padding: 0 12px;
     border: 1px solid var(--outline-var);
@@ -538,16 +677,21 @@
     font-weight: 500;
     white-space: nowrap;
   }
-  .outline-btn:hover { background: #f1f3f4; }
-  .outline-btn.active { background: var(--primary-container); color: var(--on-primary-container); border-color: transparent; }
+  .epoch-btn:hover { background: var(--surface-hover); }
+  .epoch-btn.active { background: var(--chip-selected); color: var(--on-chip-selected); border-color: transparent; }
+  .epoch-btn.interp { border-style: dashed; border-color: #e3a43d; color: var(--pred); }
+  .epoch-btn.interp.active { background: var(--pred-container); color: #2c1600; border-color: transparent; border-style: solid; }
 
   .slider { flex: 1; min-width: 160px; display: flex; flex-direction: column; gap: 2px; }
-  #mjd-readout {
+  .slider-meta {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
     font-size: 12px;
     line-height: 16px;
-    color: var(--on-surface-var);
-    font-variant-numeric: tabular-nums;
   }
+  .mode-tag { font-family: var(--font-ui); font-weight: 500; }
+  #mjd-readout { color: var(--on-surface-var); font-variant-numeric: tabular-nums; white-space: nowrap; }
 
   #time-slider {
     -webkit-appearance: none;
@@ -582,103 +726,12 @@
   #time-slider:focus-visible::-webkit-slider-thumb { box-shadow: 0 0 0 6px rgba(11, 87, 208, 0.2); }
   #time-slider:focus-visible::-moz-range-thumb { box-shadow: 0 0 0 6px rgba(11, 87, 208, 0.2); }
 
-
-  /* ------------------------------------------------------------------
-     Visor de imagen IR por banda (esquina superior derecha)
-     ------------------------------------------------------------------ */
-  .ir-card {
-    position: fixed;
-    top: 64px;
-    right: 16px;
-    width: 272px;
-    z-index: 15;
-    background: var(--surface);
-    border-radius: 8px;
-    box-shadow: var(--elev-2);
-    overflow: hidden;
-  }
-  .ir-head {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 4px 4px 4px 16px;
-    font-family: var(--font-ui);
-    font-size: 14px;
-    font-weight: 500;
-  }
-  .ir-card.is-collapsed .ir-body { display: none; }
-  .ir-frame {
-    position: relative;
-    aspect-ratio: 1;
-    background: #000;
-  }
-  .ir-frame img {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-  .ir-frame img.is-raw { image-rendering: pixelated; }
-  .ir-frame::before, .ir-frame::after {
-    content: "";
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    background: rgba(255, 255, 255, 0.85);
-    pointer-events: none;
-    z-index: 1;
-  }
-  .ir-frame::before { width: 28px; height: 2px; margin: -1px 0 0 -14px;
-    -webkit-mask: linear-gradient(90deg, #000 35%, transparent 35% 65%, #000 65%);
-            mask: linear-gradient(90deg, #000 35%, transparent 35% 65%, #000 65%); }
-  .ir-frame::after { width: 2px; height: 28px; margin: -14px 0 0 -1px;
-    -webkit-mask: linear-gradient(180deg, #000 35%, transparent 35% 65%, #000 65%);
-            mask: linear-gradient(180deg, #000 35%, transparent 35% 65%, #000 65%); }
-  .ir-msg {
-    position: absolute;
-    inset: 0;
-    display: grid;
-    place-items: center;
-    padding: 24px;
-    text-align: center;
-    color: #e8eaed;
-    font-size: 13px;
-    z-index: 2;
-  }
-  .ir-msg[hidden] { display: none; }
-  .ir-frame:has(.ir-msg:not([hidden])) img,
-  .ir-frame:has(.ir-msg:not([hidden]))::before,
-  .ir-frame:has(.ir-msg:not([hidden]))::after { visibility: hidden; }
-  .ir-bands { display: flex; gap: 4px; padding: 8px 8px 0; overflow-x: auto; scrollbar-width: none; }
-  .ir-bands::-webkit-scrollbar { display: none; }
-  .ir-band {
-    flex: 1 0 auto;
-    height: 28px;
-    padding: 0 8px;
-    border: 1px solid var(--outline-var);
-    border-radius: 8px;
-    background: var(--surface);
-    color: var(--on-surface-var);
-    font-size: 12px;
-    font-weight: 500;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 5px;
-  }
-  .ir-band i { width: 7px; height: 7px; border-radius: 50%; flex: none; }
-  .ir-band:hover { background: #f1f3f4; }
-  .ir-band.active { background: var(--chip-selected); color: var(--on-chip-selected); border-color: transparent; }
-  .ir-caption { padding: 8px 16px 12px; font-size: 12px; line-height: 16px; color: var(--on-surface-var); }
-  .ir-caption strong { display: block; font-weight: 500; color: var(--on-surface); font-size: 13px; }
-
   /* ------------------------------------------------------------------
      Pantallas medianas: el control de tiempo se apila
      ------------------------------------------------------------------ */
   @media (max-width: 1180px) {
-    .timeline-row + .timeline-row { flex-wrap: wrap; }
-    .slider { order: -1; flex-basis: 100%; }
+    .timeline-row.controls { flex-wrap: wrap; }
+    .timeline-row.controls .slider { order: -1; flex-basis: 100%; }
   }
 
   /* ------------------------------------------------------------------
@@ -709,29 +762,29 @@
       border-radius: 2px;
       background: var(--outline-var);
     }
-    .panel-head { position: fixed; top: 8px; left: 8px; right: 8px; padding: 0; }
+    .panel-head { position: fixed; top: 8px; left: 8px; right: 8px; padding: 0; z-index: 30; }
     .panel-body { border-top: 0; }
     .coords { display: none; }
 
     .target-chips { top: 60px; left: 8px; right: 8px; }
-    .snackbar { left: 50%; top: 108px; bottom: auto; max-width: calc(100vw - 32px); }
-
-    .timeline {
+    .float-card {
+      top: 104px;
       left: 8px;
       right: 8px;
-      bottom: calc(var(--sheet-h) + 8px);
-      max-width: none;
-      padding: 10px 12px;
+      width: auto;
+      max-height: calc(100vh - var(--sheet-h) - 300px);
+      overflow-y: auto;
     }
-    .timeline { gap: 6px; }
+
+    .bottom-stack { left: 8px; right: 8px; bottom: calc(var(--sheet-h) + 8px); gap: 8px; }
+    .snackbar { font-size: 13px; line-height: 18px; padding: 8px 12px; }
+    .timeline { padding: 10px 12px; gap: 6px; }
     .timeline-row { gap: 8px; }
-    .mode-tag { display: none; }
-    .ir-card { display: none; }
     .epoch-chips { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; }
     .epoch-btn { flex: none; padding: 0 10px; }
-    .tonal-btn { height: 32px; min-width: 0; padding: 0 14px; }
+    .tonal-btn { height: 32px; padding: 0 14px; }
     .outline-btn { padding: 0 10px; font-size: 12px; }
-    .snackbar { font-size: 13px; line-height: 18px; padding: 8px 12px; }
+    .mode-tag { display: none; }
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -754,7 +807,7 @@
         <div class="search-box">
           <span class="search-mark" aria-hidden="true"></span>
           <input id="inp-query" type="text" autocomplete="off" spellcheck="false"
-                 placeholder="Busca una estrella, p. ej. WISE 0855" aria-label="Nombre o ID del objeto">
+                 placeholder="Busca una estrella, p. ej. Barnard's Star" aria-label="Nombre o ID del objeto">
           <button class="icon-btn" type="submit" aria-label="Buscar"><span class="msi">search</span></button>
         </div>
         <ul class="suggestions" id="suggestions" hidden></ul>
@@ -762,15 +815,15 @@
         <div class="coords">
           <label class="field" for="inp-ra">
             <span class="field-label">RA (°)</span>
-            <input id="inp-ra" type="number" step="any" placeholder="133.7951">
+            <input id="inp-ra" type="number" step="any" placeholder="269.4521">
           </label>
           <label class="field" for="inp-dec">
             <span class="field-label">Dec (°)</span>
-            <input id="inp-dec" type="number" step="any" placeholder="-7.2451">
+            <input id="inp-dec" type="number" step="any" placeholder="4.6934">
           </label>
           <label class="field" for="inp-fov">
             <span class="field-label">Campo (°)</span>
-            <input id="inp-fov" type="number" step="0.01" min="0.01" max="0.5" value="0.05">
+            <input id="inp-fov" type="number" step="0.01" min="0.01" max="0.5" value="0.04">
           </label>
           <button class="text-btn" type="submit">Ir</button>
         </div>
@@ -778,13 +831,33 @@
     </header>
 
     <div class="panel-body">
+      <div class="sim-banner" id="sim-banner" role="alert" hidden>
+        <span class="msi" aria-hidden="true">warning</span>
+        <span><strong>Datos de demostración simulados.</strong> No hubo conexión con IRSA ni S3, así que las posiciones y los flujos de este campo son sintéticos.</span>
+      </div>
+
+      <section class="tip" id="onboarding-box" aria-label="Cómo empezar">
+        <span class="msi" aria-hidden="true">lightbulb</span>
+        <div>
+          <p class="tip-title">Cómo empezar</p>
+          <ol>
+            <li>Elige un objetivo en los chips del mapa. Barnard's Star se mueve 10,4″ por año.</li>
+            <li>Usa las mediciones y el deslizador de fecha (MJD) para ver su desplazamiento.</li>
+            <li>Cambia entre las 6 bandas infrarrojas o abre los píxeles FITS reales.</li>
+          </ol>
+        </div>
+        <div class="tip-actions">
+          <button type="button" class="text-btn" id="btn-close-onboarding">Entendido</button>
+        </div>
+      </section>
+
       <section class="spectrum" aria-label="Espectro infrarrojo">
         <div class="spec-plot">
           <canvas id="spectrum-canvas" width="408" height="180"></canvas>
         </div>
         <div class="spec-caption">
           <span id="active-band-label">Compuesto 6 Bandas</span>
-          <span id="spec-unit">Flujo en µJy según λ en µm</span>
+          <span id="spec-unit" title="MicroJansky: unidad de flujo espectral (10⁻³² W·m⁻²·Hz⁻¹)">Flujo en µJy según λ en µm</span>
         </div>
         <div class="band-tabs" id="band-grid" role="group" aria-label="Banda infrarroja"></div>
       </section>
@@ -792,13 +865,21 @@
       <div class="place">
         <h1 class="place-name" id="obj-name">Cargando objeto…</h1>
         <span class="place-type" id="obj-type">Leyendo el catálogo</span>
-        <p class="place-about" id="obj-desc">Haz clic en cualquier punto del mapa para ver su movimiento, su espectro y su composición.</p>
+        <div class="place-origin">
+          <span class="msi" aria-hidden="true">info</span>
+          <span id="obj-origin">Origen de los parámetros: pendiente</span>
+        </div>
+        <p class="place-about" id="obj-desc">Haz clic en cualquier punto del mapa para ver su movimiento, su espectro y sus imágenes.</p>
       </div>
 
       <div class="actions">
         <button type="button" class="action action-primary" id="btn-reset-view">
           <span class="action-icon msi" aria-hidden="true">my_location</span>
           <span>Centrar</span>
+        </button>
+        <button type="button" class="action" id="btn-real-pixels">
+          <span class="action-icon msi" aria-hidden="true">satellite_alt</span>
+          <span>Píxeles FITS</span>
         </button>
         <button type="button" class="action active" id="btn-toggle-trails">
           <span class="action-icon msi" aria-hidden="true">conversion_path</span>
@@ -819,7 +900,7 @@
           <span class="msi" aria-hidden="true">speed</span>
           <div><span class="fact-val" id="tel-vel">—</span><span class="fact-label">Velocidad tangencial</span></div>
         </li>
-        <li class="fact">
+        <li class="fact" title="Milisegundos de arco por año: desplazamiento aparente en el cielo">
           <span class="msi" aria-hidden="true">open_with</span>
           <div><span class="fact-val" id="tel-pm">—</span><span class="fact-label">Movimiento propio μα*, μδ</span></div>
         </li>
@@ -829,7 +910,7 @@
         </li>
         <li class="fact">
           <span class="msi" aria-hidden="true">scale</span>
-          <div><span class="fact-val" id="tel-mass">—</span><span class="fact-label">Masa estimada</span></div>
+          <div><span class="fact-val" id="tel-mass">—</span><span class="fact-label">Masa</span></div>
         </li>
         <li class="fact">
           <span class="msi" aria-hidden="true">deblur</span>
@@ -839,75 +920,114 @@
           <span class="msi" aria-hidden="true">thermostat</span>
           <div><span class="fact-val" id="tel-temp">—</span><span class="fact-label">Temperatura efectiva</span></div>
         </li>
-        <li class="fact">
+        <li class="fact" title="Flujo calibrado en apertura, en microJansky">
           <span class="msi" aria-hidden="true">brightness_5</span>
           <div><span class="fact-val" id="tel-flux">—</span><span class="fact-label">Brillo en la banda elegida</span></div>
         </li>
         <li class="fact">
           <span class="msi" aria-hidden="true">science</span>
-          <div><span class="fact-val" id="tel-chem">—</span><span class="fact-label">Composición y firmas en el infrarrojo</span></div>
+          <div><span class="fact-val" id="tel-chem">—</span><span class="fact-label">Composición y bandas espectrales</span></div>
         </li>
       </ul>
 
       <footer class="credits">
         <p>SPHEREx Stellarium Explorer, NASA Space Apps 2026.</p>
-        <p>Datos de SPHEREx (IRSA), Gaia DR3 y ALeRCE. Fondo del cielo: AllWISE vía Aladin Lite.</p>
+        <p>Datos de SPHEREx (IRSA), Gaia DR3, ALeRCE y SIMBAD. Fondo del cielo: AllWISE vía Aladin Lite; imagen óptica: DSS2.</p>
       </footer>
     </div>
   </aside>
 
   <!-- Objetivos oficiales del desafío -->
   <nav class="target-chips" id="challenge-pills" aria-label="Objetivos del desafío NASA">
-    <button type="button" class="pill-btn" data-target="Barnard's Star"><span class="msi" aria-hidden="true">star</span>Barnard's Star</button>
+    <button type="button" class="pill-btn active" data-target="Barnard's Star"><span class="msi" aria-hidden="true">star</span>Barnard's Star</button>
     <button type="button" class="pill-btn" data-target="Epsilon Indi B"><span class="msi" aria-hidden="true">join_inner</span>Epsilon Indi B</button>
-    <button type="button" class="pill-btn active" data-target="WISE 0855"><span class="msi" aria-hidden="true">ac_unit</span>WISE 0855</button>
+    <button type="button" class="pill-btn" data-target="WISE 0855"><span class="msi" aria-hidden="true">ac_unit</span>WISE 0855</button>
     <button type="button" class="pill-btn" data-target="RW Aurigae"><span class="msi" aria-hidden="true">cyclone</span>RW Aurigae</button>
     <button type="button" class="pill-btn" data-target="R Draconis"><span class="msi" aria-hidden="true">graphic_eq</span>R Draconis</button>
   </nav>
 
-
-  <!-- Imagen infrarroja por banda -->
-  <section class="ir-card" id="ir-card" aria-label="Imagen infrarroja por banda">
-    <div class="ir-head">
-      <span>Imagen infrarroja</span>
-      <button type="button" class="icon-btn" id="ir-toggle" aria-label="Minimizar imagen" aria-expanded="true"><span class="msi">expand_less</span></button>
-    </div>
-    <div class="ir-body">
-      <div class="ir-frame">
-        <img id="ir-img" alt="">
-        <div class="ir-msg" id="ir-msg">Carga un objeto para ver su imagen.</div>
+  <!-- Imágenes del objeto elegido: óptico, píxeles SPHEREx y GIF -->
+  <section class="float-card insp-card" id="object-inspector-card" aria-label="Imágenes del objeto" style="display: none;">
+    <div class="card-head">
+      <div>
+        <h2 class="card-title" id="insp-title">Objeto seleccionado</h2>
+        <p class="card-sub" id="insp-subtitle">Coordenadas</p>
       </div>
-      <div class="ir-bands" id="ir-bands" role="group" aria-label="Banda de la imagen"></div>
-      <p class="ir-caption" id="ir-caption"></p>
+      <button type="button" class="icon-btn sm" aria-label="Cerrar" onclick="document.getElementById('object-inspector-card').style.display='none'"><span class="msi">close</span></button>
+    </div>
+
+    <div class="insp-grid">
+      <figure class="insp-tile">
+        <img id="img-optical" alt="Vista óptica DSS2">
+        <figcaption><b>Óptico</b>DSS2, luz visible</figcaption>
+      </figure>
+      <figure class="insp-tile">
+        <img id="img-spherex-blink" class="pixelated" alt="Píxeles SPHEREx desde S3">
+        <figcaption><b>SPHEREx</b><span id="blink-label">Primera y última época</span></figcaption>
+      </figure>
+      <figure class="insp-tile">
+        <div class="gif-empty" id="gif-placeholder">
+          <span>Video de los cuadros con las estrellas fijas restadas</span>
+          <button type="button" class="tonal-btn sm" id="btn-load-gif">Generar GIF</button>
+        </div>
+        <img id="img-spherex-gif" class="pixelated" alt="GIF de SPHEREx en modo resta" hidden>
+        <figcaption><b>Movimiento</b><span id="gif-label">GIF en modo resta</span></figcaption>
+      </figure>
+    </div>
+
+    <div class="card-actions">
+      <button type="button" class="outline-btn" id="btn-toggle-blink"><span class="msi" aria-hidden="true">pause</span>Pausar parpadeo</button>
+      <button type="button" class="outline-btn" id="btn-overlay-aladin"><span class="msi" aria-hidden="true">layers</span>Superponer en el mapa</button>
+      <button type="button" class="outline-btn" id="btn-toggle-gif-mode" hidden>Ver modo directo</button>
     </div>
   </section>
 
-  <!-- Estado -->
-  <div class="snackbar" id="status-toast" role="status">Cargando el cielo de SPHEREx…</div>
-
-  <!-- Mediciones y evolución temporal -->
-  <footer class="timeline" aria-label="Tiempo">
-    <div class="timeline-row">
-      <div class="epoch-chips" id="epoch-buttons" role="group" aria-label="Medición del satélite">
-        <button type="button" class="epoch-btn active" data-epoch="0">Medición 1</button>
-        <button type="button" class="epoch-btn" data-epoch="1">Medición 2</button>
-        <button type="button" class="epoch-btn" data-epoch="2">Medición 3</button>
-        <button type="button" class="epoch-btn" data-epoch="3">Medición 4</button>
-        <button type="button" class="epoch-btn interp" data-epoch="4"><span class="msi" aria-hidden="true">timeline</span>Predicción</button>
+  <!-- Píxeles FITS reales de SPHEREx -->
+  <section class="float-card fits-card" id="fits-modal" aria-label="Píxeles FITS de SPHEREx" hidden>
+    <div class="card-head">
+      <div>
+        <h2 class="card-title">Píxeles FITS de SPHEREx</h2>
+        <p class="card-sub">Recorte real desde S3, centro del campo</p>
       </div>
-      <span class="mode-tag" id="epoch-mode-tag" style="color:var(--emerald)">Medición 1 (Observada)</span>
+      <button type="button" class="icon-btn sm" id="btn-close-fits" aria-label="Cerrar"><span class="msi">close</span></button>
     </div>
+    <div class="fits-frame"><img id="fits-real-img" alt="Recorte FITS real de SPHEREx"></div>
+    <p id="fits-status-text">Compara la primera y la última época observada.</p>
+    <div class="segmented" role="group" aria-label="Época">
+      <button type="button" class="active" id="btn-fits-ep1">Época inicial</button>
+      <button type="button" id="btn-fits-ep2">Época final</button>
+    </div>
+  </section>
 
-    <div class="timeline-row">
-      <button type="button" class="tonal-btn" id="btn-play">▶ Simular</button>
-      <div class="slider">
-        <input id="time-slider" type="range" min="0" max="1000" step="1" value="0" aria-label="Fecha">
-        <span id="mjd-readout">MJD 60810.50 · 2025-05-15</span>
+  <!-- Estado + mediciones y evolución temporal -->
+  <div class="bottom-stack">
+    <div class="snackbar" id="status-toast" role="status">Cargando el cielo de SPHEREx…</div>
+
+    <footer class="timeline" aria-label="Tiempo">
+      <div class="timeline-row">
+        <div class="epoch-chips" id="epoch-buttons" role="group" aria-label="Medición">
+          <button type="button" class="epoch-btn active" data-epoch="0">Medición 1</button>
+          <button type="button" class="epoch-btn" data-epoch="1">Medición 2</button>
+          <button type="button" class="epoch-btn" data-epoch="2">Medición 3</button>
+          <button type="button" class="epoch-btn" data-epoch="3">Medición 4</button>
+          <button type="button" class="epoch-btn interp" data-epoch="4">Extrapolada</button>
+        </div>
       </div>
-      <button type="button" class="outline-btn" id="btn-horizon" title="Extiende el deslizador 100 años al futuro con las ecuaciones de movimiento">Horizonte: +1 Año</button>
-      <button type="button" class="outline-btn" id="btn-amplify" title="Amplifica visualmente los vectores de movimiento propio">Vector: 1x Real</button>
-    </div>
-  </footer>
+
+      <div class="timeline-row controls">
+        <button type="button" class="tonal-btn" id="btn-play">▶ Simular</button>
+        <div class="slider">
+          <input id="time-slider" type="range" min="0" max="1000" step="1" value="0" aria-label="Fecha">
+          <div class="slider-meta">
+            <span class="mode-tag" id="epoch-mode-tag" style="color:var(--emerald)">Medición 1 · Observada (SPHEREx)</span>
+            <span id="mjd-readout" title="Fecha juliana modificada: conteo continuo de días usado en astronomía">MJD 60810.50 · 2025-05-15</span>
+          </div>
+        </div>
+        <button type="button" class="outline-btn" id="btn-horizon" title="Extiende el deslizador 100 años al futuro con las ecuaciones de movimiento">Horizonte: +1 Año</button>
+        <button type="button" class="outline-btn" id="btn-amplify" title="Amplifica visualmente los vectores de movimiento propio">Vector: 1x Real</button>
+      </div>
+    </footer>
+  </div>
 
 <script src="https://aladin.cds.unistra.fr/AladinLite/api/v3/latest/aladin.js" charset="utf-8"></script>
 <script>
@@ -920,23 +1040,21 @@ const STATE = {
   data: null,
   aladin: null,
   aladinReady: false,
-  // Cámara de respaldo si Aladin Lite está offline
-  cam: { ra: 133.795129, dec: -7.245147, fov: 0.05 },
+  cam: { ra: 269.452076, dec: 4.693365, fov: 0.04 },
   drag: { active: false, x: 0, y: 0 },
-  // Estado temporal y espectral
   mjdMin: 60810.5,
   mjdMaxBase: 61540.9,
   mjdCurrent: 60810.5,
-  horizonYears: 0,       // 0 = hasta 5ta medición; 100 = +100 años en el futuro
-  vectorScale: 1,        // 1x real, 100x, 1000x
-  activeEpochIdx: 0,     // 0..4 o -1 si se mueve libremente con slider
-  selectedBandIdx: -1,   // -1 = Compuesto 6 bandas, 0..5 = banda específica
+  horizonYears: 0,
+  vectorScale: 1,
+  activeEpochIdx: 0,
+  selectedBandIdx: -1,
   selectedObjectName: null,
   hoveredObjectName: null,
   showBg: true,
   showTrails: true,
   playing: false,
-  screenBodies: [],      // Caché de posiciones en pantalla para clics y hover
+  screenBodies: [],
 };
 
 const $ = id => document.getElementById(id);
@@ -944,8 +1062,8 @@ const $ = id => document.getElementById(id);
 /* ----------------------------------------------------------------------------
    MODO ESTÁTICO (GitHub Pages / sin backend)
    Sin servidor Python no existe /api: se leen los JSON precalculados en
-   datos_web/ con rutas relativas. Se activa solo en github.io, al abrir el
-   archivo directamente, o si /api no responde JSON.
+   datos_web/ con rutas relativas. Se activa en github.io, al abrir el archivo
+   directamente, o si /api no responde JSON.
    ---------------------------------------------------------------------------- */
 let MODO_ESTATICO = location.hostname.endsWith("github.io") || location.protocol === "file:";
 const OBJETIVOS_ESTATICOS = [
@@ -955,6 +1073,7 @@ const OBJETIVOS_ESTATICOS = [
   { nombre: "RW Aurigae", slug: "rw_aurigae", alias: ["rw aur"] },
   { nombre: "R Draconis", slug: "r_draconis", alias: ["r dra"] },
 ];
+const AVISO_SOLO_LOCAL = "Disponible solo con el servidor local";
 function buscarObjetivoEstatico(q) {
   const t = String(q || "").trim().toLowerCase();
   if (!t) return null;
@@ -964,16 +1083,13 @@ function buscarObjetivoEstatico(q) {
 async function cargarJsonEstatico(q) {
   const obj = buscarObjetivoEstatico(q);
   if (!obj) {
-    throw new Error("Esta versión publicada solo incluye los 5 objetivos del desafío. Elige uno de los chips de arriba.");
+    throw new Error("Esta versión publicada solo incluye los 5 objetivos del desafío. Elige uno de los chips del mapa.");
   }
   const resp = await fetch(`datos_web/definitivo_${obj.slug}.json`);
   if (!resp.ok) throw new Error(`No se encontró datos_web/definitivo_${obj.slug}.json en el sitio (HTTP ${resp.status}).`);
   return resp.json();
 }
 
-/* ============================================================================
-   1. EVALUACIÓN ANALÍTICA EN TIEMPO REAL (ESPEJO DE generador_interpolacion.py)
-   ============================================================================ */
 function evaluarPosicionEnTiempo(eq, mjdObjetivo, scaleFactor = 1) {
   const dtYr = ((mjdObjetivo - eq.t0_mjd) / DIAS_POR_ANIO) * scaleFactor;
   const cosDec0 = Math.max(Math.cos((eq.dec_0_deg * Math.PI) / 180), 1e-6);
@@ -992,7 +1108,6 @@ function interpolarEspectroEnTiempo(itemEq, mjdObjetivo) {
   const refEsp = itemEq.espectro_referencia || [];
   if (!epochs.length || !refEsp.length) return refEsp;
 
-  // Buscar los 2 epochs más cercanos al mjdObjetivo para interpolar linealmente
   let e0 = epochs[0];
   let e1 = epochs[epochs.length - 1];
   for (let i = 0; i < epochs.length - 1; i++) {
@@ -1033,9 +1148,6 @@ function mjdToDateString(mjd) {
   return date.toISOString().slice(0, 10);
 }
 
-/* ============================================================================
-   2. PROYECCIÓN CELESTE (ALADIN LITE + PROYECCIÓN GNOMÓNICA DE RESPALDO)
-   ============================================================================ */
 function worldToScreen(ra, dec) {
   const canvas = $("vector-hud");
   if (STATE.aladinReady && STATE.aladin) {
@@ -1046,7 +1158,6 @@ function worldToScreen(ra, dec) {
       }
     } catch (_) {}
   }
-  // Proyección tangencial (Gnomonic TAN) autónoma si Aladin está offline
   const W = canvas.width;
   const H = canvas.height;
   const ra0 = (STATE.cam.ra * Math.PI) / 180;
@@ -1062,7 +1173,6 @@ function worldToScreen(ra, dec) {
 
   const fovRad = (STATE.cam.fov * Math.PI) / 180;
   const scale = Math.min(W, H) / fovRad;
-  // En astronomía el Este (RA creciente) apunta hacia la izquierda
   return {
     x: W / 2 - xRad * scale,
     y: H / 2 - yRad * scale,
@@ -1079,9 +1189,6 @@ function getPixelsPerArcsec() {
   return 6.0;
 }
 
-/* ============================================================================
-   3. RENDERIZADO VECTORIAL A 60 FPS (EFECTO STELLARIUM)
-   ============================================================================ */
 function renderLoop() {
   const canvas = $("vector-hud");
   const ctx = canvas.getContext("2d");
@@ -1091,8 +1198,6 @@ function renderLoop() {
   }
 
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-  // Grilla ecuatorial sutil estilo Stellarium
   drawEquatorialGrid(ctx, canvas.width, canvas.height);
 
   if (STATE.data && STATE.data.ecuaciones_trayectoria) {
@@ -1110,7 +1215,6 @@ function renderLoop() {
       const isHovered = item.nombre_oficial === STATE.hoveredObjectName;
       const isTarget = item.es_objetivo;
 
-      // 1. Dibujar trayectoria histórica y predicha (Epoch 1 -> Epoch 5 / Futuro)
       if (STATE.showTrails && (Math.abs(item.ecuacion.mu_ra_cosdec_mas_yr) > 1 || Math.abs(item.ecuacion.mu_dec_mas_yr) > 1)) {
         const posStart = evaluarPosicionEnTiempo(item.ecuacion, mjdStart, STATE.vectorScale);
         const posEnd = evaluarPosicionEnTiempo(item.ecuacion, mjdEndMax, STATE.vectorScale);
@@ -1127,7 +1231,6 @@ function renderLoop() {
           ctx.setLineDash([5, 4]);
           ctx.stroke();
 
-          // Marcar los 4 puntos reales + 5to interpolado sobre la línea
           STATE.data.epochs.forEach((ep, idxEp) => {
             const pEp = evaluarPosicionEnTiempo(item.ecuacion, ep.mjd_promedio, STATE.vectorScale);
             const sEp = worldToScreen(pEp.ra, pEp.dec);
@@ -1142,7 +1245,6 @@ function renderLoop() {
         }
       }
 
-      // 2. Determinar color y flujo según la banda infrarroja seleccionada
       const espAhora = interpolarEspectroEnTiempo(item, STATE.mjdCurrent);
       let bandColor = "#38bdf8";
       let fluxActual = 100.0;
@@ -1151,18 +1253,15 @@ function renderLoop() {
         bandColor = espAhora[STATE.selectedBandIdx].color_hex;
         fluxActual = espAhora[STATE.selectedBandIdx].flux_ujy;
       } else if (espAhora.length) {
-        // Color compuesto ponderado por flujo
         const maxPt = espAhora.reduce((a, b) => (b.flux_ujy > a.flux_ujy ? b : a), espAhora[0]);
         bandColor = maxPt.color_hex;
         fluxActual = espAhora.reduce((acc, b) => acc + b.flux_ujy, 0) / espAhora.length;
       }
 
-      // Radio visual proporcional a morfología y flujo logarítmico
       const logScale = Math.max(0.65, Math.min(2.4, Math.log10(Math.max(fluxActual, 1)) * 0.65));
       const rx = Math.max(5, Math.min(42, (item.semieje_a_arcsec * 0.45 * pxPerArcsec) * 0.35 + 4.5 * logScale));
       const ry = Math.max(4, Math.min(36, (item.semieje_b_arcsec * 0.45 * pxPerArcsec) * 0.35 + 4.5 * logScale));
 
-      // 3. Halo atmosférico/PSF tipo Stellarium
       ctx.save();
       ctx.translate(scrNow.x, scrNow.y);
       ctx.rotate((-item.angulo_deg * Math.PI) / 180);
@@ -1177,7 +1276,6 @@ function renderLoop() {
       ctx.ellipse(0, 0, rx * 2.4, ry * 2.4, 0, 0, Math.PI * 2);
       ctx.fill();
 
-      // Núcleo estelar o elipse galáctica
       ctx.beginPath();
       ctx.ellipse(0, 0, rx * 0.55, ry * 0.55, 0, 0, Math.PI * 2);
       ctx.fillStyle = "#ffffff";
@@ -1190,12 +1288,10 @@ function renderLoop() {
       }
       ctx.restore();
 
-      // 4. Retícula de selección estilo Stellarium
       if (isSelected || isHovered) {
         drawStellariumReticle(ctx, scrNow.x, scrNow.y, rx + 9, isSelected ? "#ea4335" : "#8ab4f8");
       }
 
-      // 5. Etiqueta de identificación (Gaia DR3 / Nombre oficial)
       if (isSelected || isHovered || isTarget || rx > 7.5) {
         ctx.font = isSelected ? "500 13px 'Google Sans Flex', Roboto, sans-serif" : "12px Roboto, Arial, sans-serif";
         ctx.fillStyle = isSelected ? "#ffffff" : (isTarget ? "#e8eaed" : "rgba(232, 234, 237, 0.75)");
@@ -1244,9 +1340,7 @@ function drawStellariumReticle(ctx, x, y, r, color) {
   ctx.strokeStyle = color;
   ctx.lineWidth = 1.6;
   const len = 6;
-  const corners = [
-    [-1, -1], [1, -1], [1, 1], [-1, 1]
-  ];
+  const corners = [[-1, -1], [1, -1], [1, 1], [-1, 1]];
   for (const [sx, sy] of corners) {
     ctx.beginPath();
     ctx.moveTo(x + sx * r, y + sy * (r - len));
@@ -1257,9 +1351,6 @@ function drawStellariumReticle(ctx, x, y, r, color) {
   ctx.restore();
 }
 
-/* ============================================================================
-   4. ACTUALIZACIÓN DE INSPECTOR ASTROFÍSICO Y ESPECTROMETRÍA
-   ============================================================================ */
 function updateInspectorPanel() {
   if (!STATE.data) return;
   const bodyEntry = STATE.screenBodies.find(b => b.nombre === STATE.selectedObjectName)
@@ -1272,15 +1363,16 @@ function updateInspectorPanel() {
 
   $("obj-name").textContent = item.nombre_oficial;
   $("obj-type").textContent = af.tipo_cuerpo || item.clasificacion_objeto || "Objeto Celeste";
+  $("obj-origin").textContent = `Origen: ${af.origen_parametros || "Catálogo SPHEREx"}`;
   $("obj-desc").textContent = af.descripcion_cientifica || "";
 
   $("tel-coords").textContent = `${posNow.ra.toFixed(5)}°, ${posNow.dec.toFixed(5)}°`;
-  $("tel-vel").textContent = af.velocidad_relativa_kms != null ? `${af.velocidad_relativa_kms} km/s` : "Cosmológica / N/A";
+  $("tel-vel").textContent = af.velocidad_relativa_kms != null ? `${af.velocidad_relativa_kms} km/s` : "No determinada";
   $("tel-pm").textContent = `${item.ecuacion.mu_ra_cosdec_mas_yr.toFixed(1)}, ${item.ecuacion.mu_dec_mas_yr.toFixed(1)} mas/yr`;
-  $("tel-dist").textContent = af.distancia_pc != null ? `${af.distancia_pc} pc (${af.distancia_ly} ly)` : "Extragaláctica";
-  $("tel-mass").textContent = af.masa || "—";
-  $("tel-density").textContent = af.densidad || "—";
-  $("tel-temp").textContent = af.temperatura_eff_k ? `${af.temperatura_eff_k} K` : "—";
+  $("tel-dist").textContent = af.distancia_pc != null ? `${af.distancia_pc} pc (${af.distancia_ly} ly)` : "Sin paralaje Gaia > 0.5 mas";
+  $("tel-mass").textContent = af.masa || "No determinada";
+  $("tel-density").textContent = af.densidad || "No determinada";
+  $("tel-temp").textContent = af.temperatura_eff_k ? `${af.temperatura_eff_k} K` : "No determinada";
   $("tel-chem").textContent = af.composicion_quimica || "—";
 
   if (STATE.selectedBandIdx >= 0 && espAhora[STATE.selectedBandIdx]) {
@@ -1294,6 +1386,149 @@ function updateInspectorPanel() {
   drawSpectrumChart(espAhora);
 }
 
+let blinkInterval = null;
+let blinkPausado = false;
+
+function obtenerUrlImagenOptica(ra, dec, fovDeg = 0.04) {
+  const params = new URLSearchParams({
+    hips: "CDS/P/DSS2/color",
+    ra: ra,
+    dec: dec,
+    fov: fovDeg,
+    width: 180,
+    height: 180,
+    format: "jpg"
+  });
+  return `https://alasky.cds.unistra.fr/hips-image-services/hips2fits?${params.toString()}`;
+}
+
+async function inspeccionarObjetoSeleccionado(objData) {
+  const card = document.getElementById("object-inspector-card");
+  card.style.display = "block";
+  document.getElementById("insp-title").textContent = objData.nombre_oficial || "Fuente SPHEREx";
+  document.getElementById("insp-subtitle").textContent = `RA: ${objData.ra.toFixed(5)}° | Dec: ${objData.dec.toFixed(5)}°`;
+  document.getElementById("blink-label").textContent = "Cargando píxeles de S3…";
+
+  // Reiniciar el 3er cuadro (GIF) para este nuevo objeto
+  const gifPlaceholder = document.getElementById("gif-placeholder");
+  const imgGif = document.getElementById("img-spherex-gif");
+  const btnLoadGif = document.getElementById("btn-load-gif");
+  const btnToggleGifMode = document.getElementById("btn-toggle-gif-mode");
+  const gifLabel = document.getElementById("gif-label");
+
+  gifPlaceholder.hidden = false;
+  imgGif.hidden = true;
+  imgGif.src = "";
+  btnToggleGifMode.hidden = true;
+  btnLoadGif.disabled = false;
+  btnLoadGif.textContent = "Generar GIF";
+  gifLabel.textContent = "GIF en modo resta";
+
+  let modoGifActual = "resta";
+
+  const cargarGif = () => {
+    if (MODO_ESTATICO) {
+      gifLabel.textContent = AVISO_SOLO_LOCAL;
+      return;
+    }
+    btnLoadGif.disabled = true;
+    btnLoadGif.textContent = "Generando…";
+    gifLabel.textContent = "Descargando cuadros de IRSA, unos 30 s";
+
+    const paramsGif = new URLSearchParams({
+      ra: objData.ra,
+      dec: objData.dec,
+      fov: 0.08,
+      modo: modoGifActual,
+      identificar: "true",
+    });
+
+    // Si es el objetivo principal (ej. Barnard's Star), pasa su nombre para seguir su movimiento propio
+    const nombreCentral = STATE.data?.meta?.nombre_objetivo || "";
+    if (objData.nombre_oficial === nombreCentral && !nombreCentral.startsWith("Campo")) {
+      paramsGif.set("objeto", nombreCentral);
+    }
+
+    const urlGif = `api/gif?${paramsGif.toString()}`;
+    imgGif.onload = () => {
+      gifPlaceholder.hidden = true;
+      imgGif.hidden = false;
+      btnToggleGifMode.hidden = false;
+      btnToggleGifMode.textContent = modoGifActual === "resta" ? "Ver modo directo" : "Ver modo resta";
+      gifLabel.textContent = `Modo ${modoGifActual}, fuentes identificadas`;
+    };
+    imgGif.onerror = () => {
+      btnLoadGif.disabled = false;
+      btnLoadGif.textContent = "Reintentar";
+      gifLabel.textContent = "IRSA no respondió o no cubre este punto";
+    };
+    imgGif.src = urlGif;
+  };
+
+  btnLoadGif.onclick = cargarGif;
+  btnToggleGifMode.onclick = () => {
+    modoGifActual = modoGifActual === "resta" ? "directo" : "resta";
+    gifPlaceholder.hidden = false;
+    imgGif.hidden = true;
+    cargarGif();
+  };
+
+  const fovActual = STATE.data?.centro_campo?.fov_deg || 0.04;
+
+  // 1. Cargar foto óptica desde CDS (DSS2)
+  document.getElementById("img-optical").src = obtenerUrlImagenOptica(objData.ra, objData.dec, fovActual);
+
+  // 2. Pedir recortes reales de SPHEREx a tu backend (S3)
+  if (MODO_ESTATICO) {
+    document.getElementById("blink-label").textContent = AVISO_SOLO_LOCAL;
+    return;
+  }
+  const url = `api/inspect_pixels?ra=${objData.ra}&dec=${objData.dec}&fov_deg=${fovActual}`;
+  let resp;
+  try { resp = await fetch(url); } catch (_) { resp = { ok: false }; }
+  if (!resp.ok) {
+    document.getElementById("blink-label").textContent = "Sin FITS en S3 para este punto";
+    return;
+  }
+  const recortes = await resp.json();
+  if (!recortes.epoch_1) return;
+
+  // 3. Iniciar Blink Comparator entre época inicial y final
+  const imgBlink = document.getElementById("img-spherex-blink");
+  const labelBlink = document.getElementById("blink-label");
+  let mostrandoEpoch1 = true;
+  blinkPausado = false;
+
+  if (blinkInterval) clearInterval(blinkInterval);
+  imgBlink.src = recortes.epoch_1.png_base64;
+  labelBlink.textContent = `Primera época, MJD ${recortes.epoch_1.mjd || ""}`;
+
+  blinkInterval = setInterval(() => {
+    if (blinkPausado) return;
+    mostrandoEpoch1 = !mostrandoEpoch1;
+    imgBlink.src = mostrandoEpoch1 ? recortes.epoch_1.png_base64 : recortes.epoch_last.png_base64;
+    labelBlink.textContent = mostrandoEpoch1
+      ? `Primera época, MJD ${recortes.epoch_1.mjd || ""}`
+      : `Última época, MJD ${recortes.epoch_last.mjd || ""}`;
+  }, 550);
+
+  document.getElementById("btn-toggle-blink").onclick = () => {
+    blinkPausado = !blinkPausado;
+    document.getElementById("btn-toggle-blink").innerHTML = blinkPausado
+      ? '<span class="msi" aria-hidden="true">play_arrow</span>Reanudar parpadeo'
+      : '<span class="msi" aria-hidden="true">pause</span>Pausar parpadeo';
+  };
+
+  // 4. Superponer píxeles reales sobre el mapa de Aladin Lite
+  document.getElementById("btn-overlay-aladin").onclick = () => {
+    if (!STATE.aladinReady || !STATE.aladin) return;
+    const overlay = A.imageOverlay(recortes.epoch_last.png_base64, {
+      bounds: recortes.epoch_last.bounds,
+      opacity: 0.7,
+    });
+    STATE.aladin.addImageOverlay(overlay);
+  };
+}
 function drawSpectrumChart(espectro) {
   const canvas = $("spectrum-canvas");
   const ctx = canvas.getContext("2d");
@@ -1315,7 +1550,6 @@ function drawSpectrumChart(espectro) {
   const toX = v => pad.l + ((v - xMin) / (xMax - xMin || 1)) * (W - pad.l - pad.r);
   const toY = v => H - pad.b - ((v - yMin) / (yMax - yMin || 1)) * (H - pad.t - pad.b);
 
-  // Ejes y guías horizontales
   ctx.strokeStyle = "#e3e3e3";
   ctx.lineWidth = 1;
   for (let i = 0; i <= 3; i++) {
@@ -1326,7 +1560,6 @@ function drawSpectrumChart(espectro) {
     ctx.stroke();
   }
 
-  // Área bajo la curva espectral
   ctx.beginPath();
   espectro.forEach((p, idx) => {
     const x = toX(p.lambda_um);
@@ -1338,13 +1571,11 @@ function drawSpectrumChart(espectro) {
   ctx.lineWidth = 2;
   ctx.stroke();
 
-  // Puntos de cada banda con barras de error
   espectro.forEach((p, idx) => {
     const x = toX(p.lambda_um);
     const y = toY(p.flux_ujy);
     const isSel = STATE.selectedBandIdx === idx;
 
-    // Barra de error
     const errPx = ((p.flux_err_ujy || 0) / (yMax - yMin)) * (H - pad.t - pad.b);
     ctx.strokeStyle = "rgba(68, 71, 70, 0.5)";
     ctx.beginPath();
@@ -1361,7 +1592,6 @@ function drawSpectrumChart(espectro) {
     ctx.stroke();
   });
 
-  // Etiquetas de ejes
   ctx.fillStyle = "#444746";
   ctx.font = "11px Roboto, Arial, sans-serif";
   ctx.textAlign = "left";
@@ -1372,9 +1602,6 @@ function drawSpectrumChart(espectro) {
   ctx.fillText("0", pad.l - 5, H - pad.b);
 }
 
-/* ============================================================================
-   5. CONTROLES DE BANDAS, MEDICIONES (1-5) Y SLIDER TEMPORAL
-   ============================================================================ */
 function buildBandButtons(bandas) {
   const grid = $("band-grid");
   let html = `<button type="button" class="band-btn ${STATE.selectedBandIdx === -1 ? "active" : ""}" data-band="-1">
@@ -1417,10 +1644,17 @@ function selectMeasurementEpoch(idx) {
     b.classList.toggle("active", i === idx);
   });
 
-  $("epoch-mode-tag").textContent = ep.es_interpolado
-    ? "5ª Medición (Predicción Interpolador)"
-    : `Medición ${idx + 1} (Satélite SPHEREx)`;
-  $("epoch-mode-tag").style.color = ep.es_interpolado ? "var(--gold)" : "var(--emerald)";
+  const tipo = ep.tipo_medicion || (ep.es_extrapolado ? "extrapolada" : "observada_spherex");
+  const etiquetas = {
+    observada_spherex: `Medición ${idx + 1} · Observada (SPHEREx)`,
+    proyectada_gaia: `Medición ${idx + 1} · Proyectada (Cinemática Gaia DR3)`,
+    extrapolada: `5ª Medición · Extrapolación Analítica`,
+    simulada: `Medición ${idx + 1} · Simulada (Modo Offline)`,
+  };
+  $("epoch-mode-tag").textContent = etiquetas[tipo] || `Medición ${idx + 1}`;
+  $("epoch-mode-tag").style.color = tipo === "observada_spherex"
+    ? "var(--emerald)"
+    : (tipo === "proyectada_gaia" ? "var(--accent)" : (tipo === "simulada" ? "var(--rose)" : "var(--gold)"));
   updateInspectorPanel();
 }
 
@@ -1483,6 +1717,42 @@ $("btn-reset-view").onclick = () => {
   centerCamera(STATE.data.centro_campo.ra, STATE.data.centro_campo.dec, STATE.data.centro_campo.fov_deg);
 };
 
+$("btn-close-onboarding").onclick = () => {
+  $("onboarding-box").style.display = "none";
+};
+
+$("btn-close-fits").onclick = () => {
+  $("fits-modal").hidden = true;
+};
+
+function loadRealFitsCutout(epIdx) {
+  if (!STATE.data) return;
+  const { ra, dec, fov_deg } = STATE.data.centro_campo;
+  $("fits-status-text").textContent = "Descargando el recorte FITS desde S3…";
+  $("btn-fits-ep1").classList.toggle("active", epIdx === 0);
+  $("btn-fits-ep2").classList.toggle("active", epIdx === 1);
+
+  if (MODO_ESTATICO) {
+    $("fits-status-text").textContent = `${AVISO_SOLO_LOCAL}.`;
+    return;
+  }
+  const imgEl = $("fits-real-img");
+  imgEl.onload = () => {
+    $("fits-status-text").textContent = `Recorte FITS real SPHEREx (${epIdx === 0 ? "Época inicial" : "Época final"}).`;
+  };
+  imgEl.onerror = () => {
+    $("fits-status-text").textContent = "No hay recorte FITS real disponible en S3 para esta coordenada/sesión.";
+  };
+  imgEl.src = `api/cutout-png?ra=${ra}&dec=${dec}&fov=${fov_deg}&epoch_idx=${epIdx}`;
+}
+
+$("btn-real-pixels").onclick = () => {
+  $("fits-modal").hidden = false;
+  loadRealFitsCutout(0);
+};
+$("btn-fits-ep1").onclick = () => loadRealFitsCutout(0);
+$("btn-fits-ep2").onclick = () => loadRealFitsCutout(1);
+
 setInterval(() => {
   if (!STATE.playing || !STATE.data) return;
   const mjdEnd = STATE.mjdMaxBase + STATE.horizonYears * DIAS_POR_ANIO;
@@ -1493,9 +1763,6 @@ setInterval(() => {
   updateInspectorPanel();
 }, 40);
 
-/* ============================================================================
-   6. INTERACCIÓN CON EL MAPA CELESTE (CLIC EN OBJETOS, ZOOM Y PAN)
-   ============================================================================ */
 const hudCanvas = $("vector-hud");
 
 hudCanvas.addEventListener("mousemove", e => {
@@ -1533,21 +1800,19 @@ hudCanvas.addEventListener("mousedown", e => {
   const mx = e.clientX - rect.left;
   const my = e.clientY - rect.top;
 
-  // Verificar si hizo clic sobre un objeto celeste
   for (const b of STATE.screenBodies) {
     if (Math.hypot(mx - b.x, my - b.y) <= b.hitRadius) {
       STATE.selectedObjectName = b.nombre;
       updateInspectorPanel();
+      inspeccionarObjetoSeleccionado({
+        nombre_oficial: b.nombre,
+        ra: b.posNow.ra,
+        dec: b.posNow.dec
+      });
       return;
     }
   }
-
-  if (!STATE.aladinReady) {
-    STATE.drag = { active: true, x: mx, y: my };
-  } else if (STATE.aladin) {
-    // Reenviar arrastre a Aladin Lite si el usuario arrastra el cielo vacío
-    STATE.drag = { active: true, x: mx, y: my };
-  }
+  STATE.drag = { active: true, x: mx, y: my };
 });
 
 window.addEventListener("mouseup", () => {
@@ -1573,11 +1838,8 @@ function centerCamera(ra, dec, fov) {
   }
 }
 
-/* ============================================================================
-   7. CARGA DE DATOS DESDE EL BACKEND (/api/timeline) Y BUSCADOR
-   ============================================================================ */
 async function cargarRegionEspacial({ q = null, ra = null, dec = null, fov = null }) {
-  $("status-toast").textContent = `Procesando catálogo SPHEREx + Gaia DR3 + Interpolador...`;
+  $("status-toast").textContent = "Cargando catálogo SPHEREx y Gaia DR3…";
 
   const params = new URLSearchParams();
   if (q) params.set("q", q);
@@ -1600,29 +1862,42 @@ async function cargarRegionEspacial({ q = null, ra = null, dec = null, fov = nul
     if (MODO_ESTATICO) data = await cargarJsonEstatico(q);
 
     STATE.data = data;
+    STATE.screenBodies = [];
     STATE.mjdMin = data.rango_temporal_mjd.mjd_inicio;
     STATE.mjdMaxBase = data.rango_temporal_mjd.mjd_fin_interpolado;
     STATE.mjdCurrent = STATE.mjdMin;
     STATE.selectedBandIdx = -1;
 
+    const esSimulado = Boolean(data.es_simulado || (data.meta?.origen_datos || "").includes("SIMULADO"));
+    $("sim-banner").hidden = !esSimulado;
+
+    document.querySelectorAll(".epoch-btn").forEach((btn, idx) => {
+      const ep = data.epochs[idx];
+      if (!ep) return;
+      const tipo = ep.tipo_medicion || (ep.es_extrapolado ? "extrapolada" : "observada_spherex");
+      const badge = tipo === "observada_spherex"
+        ? "Obs. SPHEREx"
+        : (tipo === "proyectada_gaia" ? "Proy. Gaia" : (tipo === "simulada" ? "Simulada" : "Extrapolada"));
+      btn.textContent = `${idx + 1}ª (${badge})`;
+    });
+
     $("inp-ra").value = data.centro_campo.ra.toFixed(6);
     $("inp-dec").value = data.centro_campo.dec.toFixed(6);
     $("inp-fov").value = data.centro_campo.fov_deg;
 
-    // Seleccionar el objeto principal por defecto
     const objCentral = data.ecuaciones_trayectoria.find(x => x.es_objetivo) || data.ecuaciones_trayectoria[0];
     STATE.selectedObjectName = objCentral ? objCentral.nombre_oficial : null;
 
     centerCamera(data.centro_campo.ra, data.centro_campo.dec, data.centro_campo.fov_deg);
     buildBandButtons(data.meta?.bandas_disponibles || []);
     selectMeasurementEpoch(0);
+    requestAnimationFrame(() => requestAnimationFrame(updateInspectorPanel));
 
-    // Resaltar pill si coincide con objetivo del Challenge
     document.querySelectorAll(".pill-btn").forEach(btn => {
       btn.classList.toggle("active", btn.dataset.target.toLowerCase() === (data.meta?.nombre_objetivo || "").toLowerCase());
     });
 
-    $("status-toast").textContent = `${data.meta?.nombre_objetivo} · ${data.ecuaciones_trayectoria.length} cuerpos vectorizados (${data.meta?.origen_datos})`;
+    $("status-toast").textContent = `${data.meta?.nombre_objetivo} · ${data.ecuaciones_trayectoria.length} cuerpos (${data.meta?.origen_datos})`;
   } catch (err) {
     $("status-toast").textContent = `Error: ${err.message}`;
   }
@@ -1634,7 +1909,7 @@ $("search-form").addEventListener("submit", e => {
   const qVal = $("inp-query").value.trim();
   const raVal = $("inp-ra").value.trim() ? Number($("inp-ra").value) : null;
   const decVal = $("inp-dec").value.trim() ? Number($("inp-dec").value) : null;
-  const fovVal = $("inp-fov").value.trim() ? Number($("inp-fov").value) : 0.05;
+  const fovVal = $("inp-fov").value.trim() ? Number($("inp-fov").value) : 0.04;
 
   if (qVal) {
     cargarRegionEspacial({ q: qVal, fov: fovVal });
@@ -1651,7 +1926,6 @@ document.querySelectorAll(".pill-btn").forEach(btn => {
   };
 });
 
-// Autocompletado de búsqueda
 let suggestTimer = null;
 $("inp-query").addEventListener("input", () => {
   clearTimeout(suggestTimer);
@@ -1694,22 +1968,18 @@ $("inp-query").addEventListener("blur", () => {
   setTimeout(() => { $("suggestions").hidden = true; }, 150);
 });
 
-/* ============================================================================
-   8. ARRANQUE DEL OBSERVATORIO
-   ============================================================================ */
 function startApp() {
   requestAnimationFrame(renderLoop);
-  // Cargar WISE 0855 como vista inicial
-  $("inp-query").value = "WISE 0855";
-  cargarRegionEspacial({ q: "WISE 0855" });
+  $("inp-query").value = "Barnard's Star";
+  cargarRegionEspacial({ q: "Barnard's Star" });
 }
 
 if (typeof A !== "undefined" && A.init) {
   A.init.then(() => {
     STATE.aladin = A.aladin("#aladin-map", {
       survey: "P/allWISE/color",
-      fov: 0.11,
-      target: "133.795129 -7.245147",
+      fov: 0.09,
+      target: "269.452076 4.693365",
       showCooGrid: false,
       showControls: false,
       showFrame: false,
@@ -1724,127 +1994,6 @@ if (typeof A !== "undefined" && A.init) {
   STATE.aladinReady = false;
   startApp();
 }
-</script>
-<script>
-"use strict";
-/* ============================================================================
-   9. VISOR DE IMAGEN IR POR BANDA
-   Usa el recorte real del FITS de SPHEREx (/api/cutout) cuando el campo viene
-   del pipeline en vivo; si no hay FITS, muestra la imagen de referencia más
-   cercana en longitud de onda (DSS2 NIR, 2MASS o AllWISE) vía hips2fits de CDS.
-   ============================================================================ */
-(function visorIR() {
-  const REFERENCIAS = [
-    [1.0, "CDS/P/DSS2/NIR", "DSS2 NIR"],
-    [1.45, "CDS/P/2MASS/J", "2MASS J"],
-    [1.9, "CDS/P/2MASS/H", "2MASS H"],
-    [2.8, "CDS/P/2MASS/K", "2MASS Ks"],
-    [3.9, "CDS/P/allWISE/W1", "AllWISE W1"],
-    [Infinity, "CDS/P/allWISE/W2", "AllWISE W2"],
-  ];
-  const img = $("ir-img");
-  const msg = $("ir-msg");
-  const caption = $("ir-caption");
-  const bandsBox = $("ir-bands");
-  let bandaIR = 0;
-  let ultimaClave = "";
-  let bandasPintadas = "";
-
-  $("ir-toggle").onclick = () => {
-    const card = $("ir-card");
-    const colapsado = card.classList.toggle("is-collapsed");
-    $("ir-toggle").setAttribute("aria-expanded", String(!colapsado));
-    $("ir-toggle").querySelector(".msi").textContent = colapsado ? "expand_more" : "expand_less";
-  };
-
-  // Medición con imagen propia más cercana a la fecha mostrada
-  function medicionConImagen() {
-    const eps = STATE.data.epochs || [];
-    let mejor = -1;
-    let mejorDist = Infinity;
-    eps.forEach((ep, i) => {
-      if (ep.es_interpolado || ep.es_reconstruida_cadencia) return;
-      const d = Math.abs(ep.mjd_promedio - STATE.mjdCurrent);
-      if (d < mejorDist) { mejorDist = d; mejor = i; }
-    });
-    return mejor;
-  }
-
-  function urlReferencia(lambda) {
-    const [, hips, nombre] = REFERENCIAS.find(r => lambda < r[0]);
-    const c = STATE.data.centro_campo;
-    const q = new URLSearchParams({
-      hips, width: 256, height: 256, fov: c.fov_deg, ra: c.ra, dec: c.dec,
-      projection: "TAN", format: "png", stretch: "asinh", cmap: "inferno",
-    });
-    return { url: `https://alasky.cds.unistra.fr/hips-image-services/hips2fits?${q}`, nombre };
-  }
-
-  function pintarBotones(bandas) {
-    const firma = bandas.map(b => b.lambda_um).join(",");
-    if (firma === bandasPintadas) {
-      bandsBox.querySelectorAll(".ir-band").forEach((b, i) => b.classList.toggle("active", i === bandaIR));
-      return;
-    }
-    bandasPintadas = firma;
-    bandsBox.innerHTML = bandas.map((b, i) =>
-      `<button type="button" class="ir-band ${i === bandaIR ? "active" : ""}" data-i="${i}" title="${b.lambda_um.toFixed(3)} µm">
-         <i style="background:${b.color_hex}"></i>${b.lambda_um.toFixed(2)}</button>`).join("");
-    bandsBox.querySelectorAll(".ir-band").forEach(btn => {
-      btn.onclick = () => {
-        // Sincroniza con las pestañas de banda del panel (actualiza mapa y espectro)
-        const tab = document.querySelector(`#band-grid .band-btn[data-band="${btn.dataset.i}"]`);
-        if (tab) tab.click(); else bandaIR = Number(btn.dataset.i);
-      };
-    });
-  }
-
-  function mostrarReferencia(lambda, nota) {
-    const ref = urlReferencia(lambda);
-    img.classList.remove("is-raw");
-    img.onerror = () => {
-      msg.hidden = false;
-      msg.textContent = "No hay imagen disponible para esta banda.";
-    };
-    img.src = ref.url;
-    caption.innerHTML = `<strong>Referencia ${ref.nombre}</strong>${nota}`;
-  }
-
-  function actualizar() {
-    if (!STATE.data) return;
-    const bandas = STATE.data.meta?.bandas_disponibles || [];
-    if (!bandas.length) return;
-    if (STATE.selectedBandIdx >= 0) bandaIR = STATE.selectedBandIdx;
-    bandaIR = Math.min(bandaIR, bandas.length - 1);
-    pintarBotones(bandas);
-
-    const slug = STATE.data.meta?.slug || "";
-    const enVivo = String(STATE.data.meta?.origen_datos || "").startsWith("NASA_SPHEREx_S3");
-    const epIdx = enVivo ? medicionConImagen() : -1;
-    const clave = `${slug}|${epIdx}|${bandaIR}|${enVivo}`;
-    if (clave === ultimaClave) return;
-    ultimaClave = clave;
-
-    const lambda = bandas[bandaIR].lambda_um;
-    msg.hidden = false;
-    msg.textContent = "Cargando imagen…";
-    img.removeAttribute("src");
-    img.onload = () => { msg.hidden = true; };
-
-    if (enVivo && epIdx >= 0) {
-      img.classList.add("is-raw");
-      img.onerror = () => mostrarReferencia(lambda, "El FITS de SPHEREx no se pudo leer para esta banda.");
-      img.src = MODO_ESTATICO
-        ? `datos_web/cutouts/${encodeURIComponent(slug)}_e${epIdx}_b${bandaIR}.png`
-        : `api/cutout/${encodeURIComponent(slug)}/${epIdx}/${bandaIR}.png`;
-      caption.innerHTML = `<strong>SPHEREx, medición ${epIdx + 1}</strong>λ ${lambda.toFixed(3)} µm. Píxeles de 6.2″ en la orientación del detector.`;
-    } else {
-      mostrarReferencia(lambda, ` en la banda más cercana a ${lambda.toFixed(2)} µm. Este campo no tiene imágenes SPHEREx cargadas.`);
-    }
-  }
-
-  setInterval(actualizar, 250);
-})();
 </script>
 </body>
 </html>
