@@ -941,6 +941,36 @@ const STATE = {
 
 const $ = id => document.getElementById(id);
 
+/* ----------------------------------------------------------------------------
+   MODO ESTÁTICO (GitHub Pages / sin backend)
+   Sin servidor Python no existe /api: se leen los JSON precalculados en
+   datos_web/ con rutas relativas. Se activa solo en github.io, al abrir el
+   archivo directamente, o si /api no responde JSON.
+   ---------------------------------------------------------------------------- */
+let MODO_ESTATICO = location.hostname.endsWith("github.io") || location.protocol === "file:";
+const OBJETIVOS_ESTATICOS = [
+  { nombre: "Barnard's Star", slug: "barnards_star", alias: ["barnard", "gliese 699", "gj 699"] },
+  { nombre: "Epsilon Indi B", slug: "epsilon_indi_b", alias: ["eps ind b", "epsilon indi"] },
+  { nombre: "WISE 0855", slug: "wise_0855", alias: ["wise 0855-0714", "wise j085510.83-071442.5"] },
+  { nombre: "RW Aurigae", slug: "rw_aurigae", alias: ["rw aur"] },
+  { nombre: "R Draconis", slug: "r_draconis", alias: ["r dra"] },
+];
+function buscarObjetivoEstatico(q) {
+  const t = String(q || "").trim().toLowerCase();
+  if (!t) return null;
+  return OBJETIVOS_ESTATICOS.find(o =>
+    o.nombre.toLowerCase() === t || o.slug === t || o.alias.some(a => t.includes(a))) || null;
+}
+async function cargarJsonEstatico(q) {
+  const obj = buscarObjetivoEstatico(q);
+  if (!obj) {
+    throw new Error("Esta versión publicada solo incluye los 5 objetivos del desafío. Elige uno de los chips de arriba.");
+  }
+  const resp = await fetch(`datos_web/definitivo_${obj.slug}.json`);
+  if (!resp.ok) throw new Error(`No se encontró datos_web/definitivo_${obj.slug}.json en el sitio (HTTP ${resp.status}).`);
+  return resp.json();
+}
+
 /* ============================================================================
    1. EVALUACIÓN ANALÍTICA EN TIEMPO REAL (ESPEJO DE generador_interpolacion.py)
    ============================================================================ */
@@ -1556,9 +1586,18 @@ async function cargarRegionEspacial({ q = null, ra = null, dec = null, fov = nul
   if (fov != null && isFinite(fov)) params.set("fov", fov);
 
   try {
-    const resp = await fetch(`/api/timeline?${params.toString()}`);
-    const data = await resp.json();
-    if (!resp.ok) throw new Error(data.detail || `HTTP ${resp.status}`);
+    let data = null;
+    if (!MODO_ESTATICO) {
+      const resp = await fetch(`api/timeline?${params.toString()}`);
+      const esJson = (resp.headers.get("content-type") || "").includes("application/json");
+      if (esJson) {
+        data = await resp.json();
+        if (!resp.ok) throw new Error(data.detail || `HTTP ${resp.status}`);
+      } else {
+        MODO_ESTATICO = true;   // No hay backend: el servidor devolvió HTML
+      }
+    }
+    if (MODO_ESTATICO) data = await cargarJsonEstatico(q);
 
     STATE.data = data;
     STATE.mjdMin = data.rango_temporal_mjd.mjd_inicio;
@@ -1623,8 +1662,16 @@ $("inp-query").addEventListener("input", () => {
   }
   suggestTimer = setTimeout(async () => {
     try {
-      const r = await fetch(`/api/suggest?q=${encodeURIComponent(val)}`);
-      const j = await r.json();
+      let j;
+      if (MODO_ESTATICO) {
+        const t = val.toLowerCase();
+        j = { names: OBJETIVOS_ESTATICOS
+          .filter(o => o.nombre.toLowerCase().includes(t) || o.alias.some(a => a.includes(t)))
+          .map(o => o.nombre) };
+      } else {
+        const r = await fetch(`api/suggest?q=${encodeURIComponent(val)}`);
+        j = await r.json();
+      }
       const ul = $("suggestions");
       if (!j.names?.length) {
         ul.hidden = true;
@@ -1787,7 +1834,9 @@ if (typeof A !== "undefined" && A.init) {
     if (enVivo && epIdx >= 0) {
       img.classList.add("is-raw");
       img.onerror = () => mostrarReferencia(lambda, "El FITS de SPHEREx no se pudo leer para esta banda.");
-      img.src = `/api/cutout/${encodeURIComponent(slug)}/${epIdx}/${bandaIR}.png`;
+      img.src = MODO_ESTATICO
+        ? `datos_web/cutouts/${encodeURIComponent(slug)}_e${epIdx}_b${bandaIR}.png`
+        : `api/cutout/${encodeURIComponent(slug)}/${epIdx}/${bandaIR}.png`;
       caption.innerHTML = `<strong>SPHEREx, medición ${epIdx + 1}</strong>λ ${lambda.toFixed(3)} µm. Píxeles de 6.2″ en la orientación del detector.`;
     } else {
       mostrarReferencia(lambda, ` en la banda más cercana a ${lambda.toFixed(2)} µm. Este campo no tiene imágenes SPHEREx cargadas.`);
